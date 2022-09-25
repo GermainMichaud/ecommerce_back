@@ -1,0 +1,86 @@
+{
+  "name": "ecommerce_express",
+  "version": "1.0.0",
+  "description": "A light Ecommerce API",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node dist/src/index.js",
+    "lint:fix": "eslint ./src --ext .ts --quiet --fix --ignore-path ./.gitignore",
+    "lint:format": "prettier  --loglevel warn --write \"./**/*.{ts,md,json}\" ",
+    "lint": "npm run lint:format && npm run lint:fix ",
+    "prepare": "husky install",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "type-check": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/GermainMichaud/ecommerce_api.git"
+  },
+  "keywords": [
+    "Ecommerce",
+    "ExpressJS",
+    "Mongoose",
+    "Typegoose",
+    "Typescript"
+  ],
+  "author": "Germain Michaud <gmichaud.dev+github@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GermainMichaud/ecommerce_api/issues"
+  },
+  "homepage": "https://github.com/GermainMichaud/ecommerce_api#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@types/compression": "^1.7.2",
+    "@types/config": "^3.3.0",
+    "@types/cors": "^2.8.12",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.14",
+    "@types/jsonwebtoken": "^8.5.9",
+    "@types/nanoid": "^3.0.0",
+    "@types/node": "^18.7.20",
+    "@types/pino": "^7.0.5",
+    "@types/swagger-jsdoc": "^6.0.1",
+    "@types/swagger-ui-express": "^4.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "@vitest/coverage-c8": "^0.23.4",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "husky": "^8.0.0",
+    "prettier": "^2.7.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.8.3",
+    "vitest": "^0.23.4"
+  },
+  "dependencies": {
+    "argon2": "^0.29.1",
+    "compression": "^1.7.4",
+    "config": "^3.3.8",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.5",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "helmet": "^6.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "nanoid": "^4.0.0",
+    "pino": "^8.6.0",
+    "pino-pretty": "^9.1.0",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.5.0",
+    "zod": "^3.19.1"
+  },
+  "pre-commit": "lint",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
