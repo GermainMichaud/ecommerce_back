@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "start": "node dist/src/index.js",
+    "start": "npm run build && node dist/src/index.js",
     "lint:fix": "eslint ./src --ext .ts --quiet --fix --ignore-path ./.gitignore",
     "lint:format": "prettier  --loglevel warn --write \"./**/*.{ts,md,json}\" ",
     "lint": "npm run lint:format && npm run lint:fix ",
@@ -49,6 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
     "@vitest/coverage-c8": "^0.23.4",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
