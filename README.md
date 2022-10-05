@@ -37,6 +37,16 @@ yarn
 pnpm install
 ```
 
+### Set the env file
+
+> create a `.env` file and set variables
+
+```sh
+PORT=4000
+DATABASE_URL="mongodb+srv://<USERNAME>:<PASSWORD>@<HOST>/<DB_NAME>?retryWrites=true&w=majority"
+database="mongodb+srv://<USERNAME>:<PASSWORD>@<HOST>/<DB_NAME>?retryWrites=true&w=majority"
+```
+
 ### Run the project in `DEV` mode
 
 ```sh
