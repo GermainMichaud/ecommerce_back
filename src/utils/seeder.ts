@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { writeFile } from 'fs/promises';
 import { nanoid } from 'nanoid';
 
@@ -9,6 +11,8 @@ import {
   createSize,
   createVariant,
 } from '../services';
+import { connect, disconnect } from './db';
+import log from './logger';
 import { randomNumber } from './utils';
 
 const sellers = [
@@ -271,18 +275,18 @@ const temp = {
 };
 
 export const seed = async () => {
-  console.log('Seeding...');
+  log.info('Seeding...');
 
   for (const [sellerIndex, seller] of sellers.entries()) {
-    console.log('Creating seller...');
+    log.info('Creating seller...');
     const newSeller = await createSeller(seller);
-    console.log(`Seller ${sellerIndex + 1} created.`);
+    log.info(`Seller ${sellerIndex + 1} created.`);
     temp.sellers.push(newSeller);
 
     const indexSellerInTemp = temp.sellers.findIndex((s) => s._id === newSeller._id);
 
     for (const product of productsBySeller[sellerIndex]) {
-      console.log('-Creating product...');
+      log.info('-Creating product...');
       const item = product.product;
       const productCreated = await createProduct({
         sku: nanoid(),
@@ -298,7 +302,7 @@ export const seed = async () => {
         variants: [],
         seller: newSeller._id,
       });
-      console.log('-Product created');
+      log.info('-Product created');
       temp.products.push(productCreated);
       const indexProductInTemp = temp.products.findIndex(
         (p) => p._id === productCreated._id,
@@ -306,15 +310,15 @@ export const seed = async () => {
 
       const savedColors = [];
       for (const color of product.colors) {
-        console.log('--Creating color...');
+        log.info('--Creating color...');
         const newColor = await createColor({
           ...color,
           product: productCreated._id as string,
         });
-        console.log('--Color created');
-        console.log('---Add color to product...');
+        log.info('--Color created');
+        log.info('---Add color to product...');
         await productCreated.addColor(newColor._id);
-        console.log('---Color added to product');
+        log.info('---Color added to product');
         temp.colors.push(newColor);
         temp.products[indexProductInTemp].colors.push(newColor);
         savedColors.push(newColor);
@@ -322,15 +326,15 @@ export const seed = async () => {
 
       const savedSizes = [];
       for (const size of product.sizes) {
-        console.log('--Creating size...');
+        log.info('--Creating size...');
         const newSize = await createSize({
           ...size,
           product: productCreated._id as string,
         });
-        console.log('--Size created');
-        console.log('---Add size to product');
+        log.info('--Size created');
+        log.info('---Add size to product');
         await productCreated.addSize(newSize._id);
-        console.log('---Size added to product');
+        log.info('---Size added to product');
         temp.sizes.push(newSize);
         temp.products[indexProductInTemp].sizes.push(newSize);
         savedSizes.push(newSize);
@@ -339,7 +343,7 @@ export const seed = async () => {
       let defaultSet = false;
       for (const [colorIdx, color] of savedColors.entries()) {
         for (const size of savedSizes) {
-          console.log('--Creating variant...');
+          log.info('--Creating variant...');
           const variant = await createVariant({
             color: color._id,
             size: size._id,
@@ -353,23 +357,32 @@ export const seed = async () => {
             description: productCreated.description || '',
           });
           defaultSet = true;
-          console.log('--Variant created');
+          log.info('--Variant created');
           temp.variants.push(variant);
-          console.log('---Add variant to product');
+          log.info('---Add variant to product');
           await productCreated.addVariant(variant._id);
-          console.log('---Variant added to product');
+          log.info('---Variant added to product');
           temp.products[indexProductInTemp].variants.push(variant._id);
         }
       }
 
-      console.log('-Add product to seller');
+      log.info('-Add product to seller');
       await newSeller.addProduct(productCreated._id);
       temp.sellers[indexSellerInTemp].products.push(productCreated._id);
-      console.log('-Product added to seller');
+      log.info('-Product added to seller');
     }
   }
-  console.log('-- Write data in ./data/data.json --');
+  log.info('Seeding done.');
+  log.info('-- Write data in ./data/data.json --');
   await writeFile('./data/data.json', JSON.stringify(temp, null, 2), {
     encoding: 'utf8',
   });
 };
+
+const seedDB = async () => {
+  await connect();
+  await seed();
+  await disconnect();
+};
+
+void seedDB();

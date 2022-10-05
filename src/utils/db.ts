@@ -14,4 +14,10 @@ const connect = async () => {
   }
 };
 
-export default connect;
+const disconnect = async () => {
+  await mongoose.disconnect();
+  await mongoose.connection.close();
+  log.info('Disconnected from MongoDB');
+};
+
+export { connect, disconnect };

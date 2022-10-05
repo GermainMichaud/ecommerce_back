@@ -11,6 +11,7 @@
     "lint:format": "prettier  --loglevel warn --write \"./**/*.{ts,md,json}\" ",
     "lint": "npm run lint:format && npm run lint:fix ",
     "prepare": "husky install",
+    "seed": "ts-node-dev --transpile-only ./src/utils/seeder.ts",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "type-check": "tsc"
