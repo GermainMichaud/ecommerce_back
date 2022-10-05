@@ -13,6 +13,6 @@ const router = Router();
  *    200:
  *     description: Application is healthy
  */
-router.get('/healthcheck', (_req, res) => res.sendStatus(200));
+router.get('/', (_req, res) => res.sendStatus(200));
 
 export default router;
