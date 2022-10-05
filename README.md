@@ -9,6 +9,8 @@
 - [Getting started](#Getting-started)
   - [Clone Repository](#Clone-the-repository)
   - [Install dependencies](#Install-dependencies)
+  - [Set the env file](#Set-the-env-file)
+  - [Seed the database](#Seed-the-database)
   - [Run the project in `DEV` mode](#Run-the-project-in-DEV-mode)
   - [Run the project in `PRODUCTION` mode](#Run-the-project-in-PRODUCTION-mode)
   - [Run tests](#Run-tests)
@@ -45,6 +47,19 @@ pnpm install
 PORT=4000
 DATABASE_URL="mongodb+srv://<USERNAME>:<PASSWORD>@<HOST>/<DB_NAME>?retryWrites=true&w=majority"
 database="mongodb+srv://<USERNAME>:<PASSWORD>@<HOST>/<DB_NAME>?retryWrites=true&w=majority"
+```
+
+### Seed the database
+
+```sh
+# with npm
+npm run seed
+
+# with yarn
+yarn seed
+
+# with pnpm
+pnpm seed
 ```
 
 ### Run the project in `DEV` mode
