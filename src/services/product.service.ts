@@ -1,3 +1,4 @@
+import { DocumentType } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import slugify from 'slugify';
 
@@ -9,11 +10,11 @@ import { VariantModel } from '../models/variant.model';
 import { CreateProductInput } from '../schemas/product.schema';
 import log from '../utils/logger';
 
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (): Promise<DocumentType<Product>[]> => {
   log.info('Getting all products');
   // eslint-disable-next-line no-useless-catch
   try {
-    return await ProductModel.find()
+    return await ProductModel.find({ quantity: { $gt: 0 } })
       .populate('seller', 'name currency ', SellerModel)
       .exec();
   } catch (error) {
@@ -23,7 +24,7 @@ export const getProducts = async (): Promise<Product[]> => {
 
 export const getProduct = async (
   id: string | Types.ObjectId,
-): Promise<Product | null> => {
+): Promise<DocumentType<Product> | null> => {
   const product = await ProductModel.findById(id)
     .populate('variants', 'color size sku name price quantity', VariantModel)
     .populate({
@@ -49,7 +50,9 @@ export const getProduct = async (
   return product;
 };
 
-export const getProductBySlug = async (slug: string): Promise<Product | null> => {
+export const getProductBySlug = async (
+  slug: string,
+): Promise<DocumentType<Product> | null> => {
   const product = await ProductModel.findOne({ slug })
     .populate('variants', 'color size sku name price quantity', VariantModel)
     .populate({
@@ -77,7 +80,7 @@ export const getProductBySlug = async (slug: string): Promise<Product | null> =>
 
 export const createProduct = async (
   data: CreateProductInput['body'],
-): Promise<Product> => {
+): Promise<DocumentType<Product>> => {
   const product = await ProductModel.create({
     ...data,
     slug: slugify(data.name.toLowerCase(), { remove: /[%!,:@/]/g }) + '-' + data.sku,

@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { DocumentType } from '@typegoose/typegoose';
 
 import { OrderStatus, PaymentMethod } from '../interfaces/order';
 import { Order, OrderModel } from '../models/order.model';
@@ -12,7 +12,7 @@ import {
 export const getOrder = async (
   token: string,
   orderId?: string,
-): Promise<Order | null> => {
+): Promise<DocumentType<Order> | null> => {
   const filter = orderId ? { orderToken: token, orderId } : { orderToken: token };
   return await OrderModel.findOne(filter);
 };
@@ -22,7 +22,7 @@ export const createOrder = async (
   cart: Record<string, any>,
   data: CreateOrderInput['body'],
   paymentStatus: OrderStatus,
-): Promise<Order> => {
+): Promise<DocumentType<Order>> => {
   const order = await OrderModel.create({
     ...data,
     orderToken: token,
@@ -37,7 +37,7 @@ export const makePayment = async (
   orderId: string,
   paymentMethod: PaymentMethod,
   paymentStatus: OrderStatus,
-): Promise<Order> => {
+): Promise<DocumentType<Order>> => {
   const order = await OrderModel.findOneAndUpdate(
     { orderId },
     { paymentMethod, paymentStatus },
