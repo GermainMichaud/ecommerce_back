@@ -4,6 +4,13 @@ dotenv.config();
 import { writeFile } from 'fs/promises';
 import { nanoid } from 'nanoid';
 
+import { Cart } from '../models/cart.model';
+import { Color } from '../models/color.model';
+import { Order } from '../models/order.model';
+import { Product } from '../models/product.model';
+import { Seller } from '../models/seller.model';
+import { Size } from '../models/size.model';
+import { Variant } from '../models/variant.model';
 import {
   createColor,
   createProduct,
@@ -30,6 +37,7 @@ const sellers = [
     phone: 'Seller 1 Phone',
     image: 'Seller 1 Image',
     rating: 4.5,
+    productsToAdd: [0, 2, 4],
   },
   {
     name: `Seller 2`,
@@ -45,6 +53,7 @@ const sellers = [
     phone: 'Seller 2 Phone',
     image: 'Seller 2 Image',
     rating: 2.5,
+    productsToAdd: [1, 3],
   },
 ];
 
@@ -253,54 +262,67 @@ const products = [
       { name: 'XL', code: 'xl' },
     ],
   },
-];
+] as {
+  product: Omit<
+    Product,
+    '_id' | 'seller' | 'sku' | 'addVariant' | 'addColor' | 'addSize' | 'removeQuantity'
+  >;
+  colors: Omit<Color, '_id'>[];
+  sizes: Omit<Size, '_id'>[];
+}[];
 
 // We have only 2 sellers
-const productsBySeller = {
-  0: [],
-  1: [],
-};
+const productsBySeller: Record<
+  number,
+  Record<string, Record<string, unknown> | unknown[]>[]
+> = {};
 for (const [idx, product] of products.entries()) {
-  productsBySeller[idx % 2].push(product);
+  const index = idx % 2;
+  if (!productsBySeller[index]) {
+    productsBySeller[index] = [];
+  }
+  productsBySeller[index].push(product);
 }
 
 const temp = {
-  sellers: [],
-  products: [],
-  variants: [],
-  colors: [],
-  sizes: [],
-  orders: [],
-  carts: [],
+  sellers: [] as Seller[],
+  products: [] as Product[],
+  variants: [] as Variant[],
+  colors: [] as Color[],
+  sizes: [] as Size[],
+  orders: [] as Order[],
+  carts: [] as Cart[],
 };
 
 export const seed = async () => {
   log.info('Seeding...');
 
-  for (const [sellerIndex, seller] of sellers.entries()) {
+  // Create sellers
+  for (const seller of sellers) {
     log.info('Creating seller...');
     const newSeller = await createSeller(seller);
-    log.info(`Seller ${sellerIndex + 1} created.`);
+    log.info(`Seller ${seller.name} created.`);
     temp.sellers.push(newSeller);
 
     const indexSellerInTemp = temp.sellers.findIndex((s) => s._id === newSeller._id);
 
-    for (const product of productsBySeller[sellerIndex]) {
+    // For each seller, create products
+    for (const productIndex of seller.productsToAdd) {
+      const { product, colors, sizes } = products[productIndex];
       log.info('-Creating product...');
-      const item = product.product;
       const productCreated = await createProduct({
         sku: nanoid(),
-        name: item.name,
-        description: item.description,
-        image: item.image,
-        images: item.images,
-        category: item.category,
-        quantity: item.quantity,
-        rating: item.rating,
+        name: product.name,
+        description: product.description as string,
+        image: product.image,
+        images: product.images,
+        category: product?.category || [],
+        quantity: product.quantity,
+        rating: product.rating as number,
         colors: [],
         sizes: [],
         variants: [],
-        seller: newSeller._id,
+        seller: newSeller._id.toString(),
       });
       log.info('-Product created');
       temp.products.push(productCreated);
@@ -308,51 +330,54 @@ export const seed = async () => {
         (p) => p._id === productCreated._id,
       );
 
+      // For each product, create colors
       const savedColors = [];
-      for (const color of product.colors) {
+      for (const color of colors) {
         log.info('--Creating color...');
         const newColor = await createColor({
           ...color,
-          product: productCreated._id as string,
+          product: productCreated._id.toString(),
         });
         log.info('--Color created');
         log.info('---Add color to product...');
-        await productCreated.addColor(newColor._id);
+        // await productCreated.addColor(newColor._id);
         log.info('---Color added to product');
         temp.colors.push(newColor);
-        temp.products[indexProductInTemp].colors.push(newColor);
+        temp.products[indexProductInTemp].colors?.push(newColor);
         savedColors.push(newColor);
       }
 
+      // For each product, create sizes
       const savedSizes = [];
-      for (const size of product.sizes) {
+      for (const size of sizes) {
         log.info('--Creating size...');
         const newSize = await createSize({
           ...size,
-          product: productCreated._id as string,
+          product: productCreated._id.toString(),
         });
         log.info('--Size created');
         log.info('---Add size to product');
-        await productCreated.addSize(newSize._id);
+        // await productCreated.addSize(newSize._id);
         log.info('---Size added to product');
         temp.sizes.push(newSize);
-        temp.products[indexProductInTemp].sizes.push(newSize);
+        temp.products[indexProductInTemp].sizes?.push(newSize);
         savedSizes.push(newSize);
       }
 
+      // For each product, create variants (colors x sizes)
       let defaultSet = false;
       for (const [colorIdx, color] of savedColors.entries()) {
         for (const size of savedSizes) {
           log.info('--Creating variant...');
           const variant = await createVariant({
-            color: color._id,
-            size: size._id,
+            color: color._id.toString(),
+            size: size._id.toString(),
             sku: nanoid(),
-            name: `${item.name} - ${color.name}/${size.name}`,
+            name: `${product.name} - ${color.name}/${size.name}`,
             price: randomNumber(1000, 2000),
             quantity: randomNumber(0, 100),
-            product: productCreated._id,
-            image: item.images[colorIdx],
+            product: productCreated._id.toString(),
+            image: product.images![colorIdx] || '',
             isDefault: defaultSet ? false : true,
             description: productCreated.description || '',
           });
@@ -362,13 +387,14 @@ export const seed = async () => {
           log.info('---Add variant to product');
           await productCreated.addVariant(variant._id);
           log.info('---Variant added to product');
-          temp.products[indexProductInTemp].variants.push(variant._id);
+          temp.products[indexProductInTemp].variants?.push(variant._id);
         }
       }
 
+      // Add product to seller
       log.info('-Add product to seller');
       await newSeller.addProduct(productCreated._id);
-      temp.sellers[indexSellerInTemp].products.push(productCreated._id);
+      temp.sellers[indexSellerInTemp].products?.push(productCreated._id);
       log.info('-Product added to seller');
     }
   }
