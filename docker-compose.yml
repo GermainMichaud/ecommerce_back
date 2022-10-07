@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27018:27017
+    networks:
+      - backend
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_DATABASE=example
+
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 4000:4000
+    networks:
+      - backend
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://root:example@mongodb:27018/example?authSource=admin
+    entrypoint: ./docker-entrypoint.sh
+
+networks:
+  backend:
