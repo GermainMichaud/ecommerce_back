@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { EmptyObject } from 'interfaces/common';
 import { nanoid } from 'nanoid';
 
+import { EmptyObject } from '../interfaces/common';
 import { BodyWithSku, BodyWithSkuAndQuantity } from '../schemas/cart.schema';
+import { CreateOrderInput } from '../schemas/order.schema';
 import {
   addItem,
   clearCart,
@@ -13,39 +14,31 @@ import {
   removeItem,
   validateCart,
 } from '../services/cart.service';
-import log from '../utils/logger';
 
 export const getCartHandler = async (req: Request, res: Response) => {
-  try {
-    const cart = await getCart(req.cookies.ecommerce as string);
-    res.json(cart);
-  } catch (error) {
-    log.error(error);
-    res.status(404).json({ error: error.message });
-  }
+  const cart = await getCart(req.cookies.ecommerce as string);
+  res.json(cart);
 };
 
-export const validateCartHandler = async (req: Request, res: Response) => {
+export const validateCartHandler = async (
+  req: Request<EmptyObject, EmptyObject, CreateOrderInput['body']>,
+  res: Response,
+) => {
   const { items } = req.body;
-  try {
-    if (!items.length) {
-      throw new Error('Cart is empty');
-    }
-    const errors = await validateCart(items);
-    if (Object.keys(errors).length) {
-      return res.status(400).send(errors);
-    }
-    const cart = {
-      id: nanoid(),
-      errors,
-      total: items.reduce((acc, cur) => acc + cur.quantity * cur.price, 0),
-    };
-    req.session.cart = cart;
-    return res.json(cart);
-  } catch (error) {
-    log.error(error);
-    res.status(500).send(error);
+  if (!items.length) {
+    throw new Error('Cart is empty');
   }
+  const errors = await validateCart(items);
+  if (Object.keys(errors).length) {
+    return res.status(400).send(errors);
+  }
+  const cart = {
+    id: nanoid(),
+    errors,
+    total: items.reduce((acc, cur) => acc + cur.quantity * cur.price, 0),
+  };
+  req.session.cart = cart;
+  return res.json(cart);
 };
 
 export const createCartHandler = async (req: Request, res: Response) => {
@@ -74,37 +67,22 @@ export const removeItemHandler = async (
   req: Request<EmptyObject, EmptyObject, BodyWithSku>,
   res: Response,
 ) => {
-  try {
-    const cart = await removeItem(req.cookies.ecommerce as string, req.body.sku);
-    res.json(cart);
-  } catch (error) {
-    log.error(error);
-    res.status(404).json({ error: error.message });
-  }
+  const cart = await removeItem(req.cookies.ecommerce as string, req.body.sku);
+  res.json(cart);
 };
 
 export const increaseQuantityHandler = async (
   req: Request<EmptyObject, EmptyObject, BodyWithSku>,
   res: Response,
 ) => {
-  try {
-    const cart = await increaseQuantity(req.cookies.ecommerce as string, req.body.sku);
-    res.json(cart);
-  } catch (error) {
-    log.error(error);
-    res.status(404).json({ error: error.message });
-  }
+  const cart = await increaseQuantity(req.cookies.ecommerce as string, req.body.sku);
+  res.json(cart);
 };
 
 export const decreaseQuantityHandler = async (
   req: Request<EmptyObject, EmptyObject, BodyWithSku>,
   res: Response,
 ) => {
-  try {
-    const cart = await decreaseQuantity(req.cookies.ecommerce as string, req.body.sku);
-    res.json(cart);
-  } catch (error) {
-    log.error(error);
-    res.status(404).json({ error: error.message });
-  }
+  const cart = await decreaseQuantity(req.cookies.ecommerce as string, req.body.sku);
+  res.json(cart);
 };
