@@ -4,6 +4,9 @@ import { Types } from 'mongoose';
 import { Product } from './product.model';
 
 class Color {
+  @Prop({ auto: true })
+  public _id: Types.ObjectId;
+
   @Prop({ required: true, type: String })
   public name: string;
 

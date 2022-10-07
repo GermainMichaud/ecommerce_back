@@ -1,9 +1,12 @@
-import { getModelForClass, Prop, Ref } from '@typegoose/typegoose';
+import { getModelForClass, Prop } from '@typegoose/typegoose';
 import mongoose, { Schema, Types } from 'mongoose';
 
 import { OrderStatus, OrderUserInfo, PaymentMethod } from '../interfaces/order';
 
 class Order {
+  @Prop({ auto: true })
+  public _id: Types.ObjectId;
+
   @Prop({ required: true, type: String })
   public orderToken!: string;
 

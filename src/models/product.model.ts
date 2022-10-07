@@ -13,6 +13,9 @@ import { Size } from './size.model';
 import { Variant, VariantModel } from './variant.model';
 
 class Product {
+  @Prop({ auto: true })
+  public _id: Types.ObjectId;
+
   @Prop({ required: true, type: String })
   public sku!: string;
 
@@ -27,6 +30,9 @@ class Product {
 
   @Prop({ required: true, type: Number })
   public quantity!: number;
+
+  @Prop({ type: () => [String] }, PropType.ARRAY)
+  public category?: string[];
 
   @Prop({ required: true, type: String })
   public image!: string;
@@ -56,17 +62,22 @@ class Product {
     this.variants?.push(variant);
     const variants = await VariantModel.find({ _id: { $in: this.variants } });
     this.price_start = Math.min(...variants.map((v) => v.price));
+    this.quantity = variants.reduce((acc, cur) => acc + cur.quantity, 0);
     await this.save();
   }
 
   public async addColor(this: DocumentType<Product>, color: Ref<Color>) {
-    this.colors?.push(color);
-    await this.save();
+    if (!this.colors?.includes(color)) {
+      this.colors?.push(color);
+      await this.save();
+    }
   }
 
   public async addSize(this: DocumentType<Product>, size: Ref<Size>) {
-    this.sizes?.push(size);
-    await this.save();
+    if (!this.sizes?.includes(size)) {
+      this.sizes?.push(size);
+      await this.save();
+    }
   }
 
   public async removeQuantity(this: DocumentType<Product>, quantity: number) {

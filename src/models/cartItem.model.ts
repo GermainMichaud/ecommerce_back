@@ -1,10 +1,13 @@
 import { DocumentType, getModelForClass, Prop } from '@typegoose/typegoose';
-import { Schema } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 import { IColor } from '../interfaces/color';
 import { ISize } from '../interfaces/size';
 
 class CartItem {
+  @Prop({ auto: true })
+  public _id: Types.ObjectId;
+
   @Prop({ required: true, type: String })
   public cartToken!: string;
 
