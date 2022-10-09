@@ -20,7 +20,7 @@ export const sendOrderConfirmationEmailToCustomer = async (order: Order) => {
       debug: false,
     },
     {
-      from: `Ecommerce Application ${config.get<string>('email.from')}`,
+      from: `Ecommerce Application ${config.get<string>('emailFrom')}`,
     },
   );
   const mailOptions = {
@@ -66,7 +66,7 @@ export const sendPurchaseOrderEmailToSeller = async (
       debug: false,
     },
     {
-      from: `Ecommerce Application ${config.get<string>('email.from')}`,
+      from: `Ecommerce Application ${config.get<string>('emailFrom')}`,
     },
   );
   const mailOptions = {
