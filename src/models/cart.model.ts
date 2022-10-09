@@ -7,7 +7,7 @@ import { CartItem, CartItemModel } from './cartItem.model';
 import { Variant } from './variant.model';
 
 class Cart {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String, unique: true })

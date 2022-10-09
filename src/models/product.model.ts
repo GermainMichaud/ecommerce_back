@@ -13,7 +13,7 @@ import { Size } from './size.model';
 import { Variant, VariantModel } from './variant.model';
 
 class Product {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String })

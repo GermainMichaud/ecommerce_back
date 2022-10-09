@@ -1,11 +1,18 @@
-import { DocumentType, getModelForClass, Prop } from '@typegoose/typegoose';
+import {
+  DocumentType,
+  getModelForClass,
+  ModelOptions,
+  Prop,
+  Severity,
+} from '@typegoose/typegoose';
 import { Schema, Types } from 'mongoose';
 
 import { IColor } from '../interfaces/color';
 import { ISize } from '../interfaces/size';
 
+@ModelOptions({ options: { allowMixed: Severity.ALLOW } })
 class CartItem {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String })

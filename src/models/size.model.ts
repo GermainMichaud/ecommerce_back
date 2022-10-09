@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 import { Product } from './product.model';
 
 class Size {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String })

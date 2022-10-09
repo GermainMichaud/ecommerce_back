@@ -6,7 +6,7 @@ import { Product } from './product.model';
 import { Size } from './size.model';
 
 class Variant {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String })

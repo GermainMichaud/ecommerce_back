@@ -1,10 +1,11 @@
-import { getModelForClass, Prop } from '@typegoose/typegoose';
+import { getModelForClass, ModelOptions, Prop, Severity } from '@typegoose/typegoose';
 import mongoose, { Schema, Types } from 'mongoose';
 
 import { OrderStatus, OrderUserInfo, PaymentMethod } from '../interfaces/order';
 
+@ModelOptions({ options: { allowMixed: Severity.ALLOW } })
 class Order {
-  @Prop({ auto: true })
+  @Prop({ auto: true, type: Types.ObjectId })
   public _id: Types.ObjectId;
 
   @Prop({ required: true, type: String })
