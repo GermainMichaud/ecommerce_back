@@ -12,8 +12,10 @@ dist
 dist-ssr
 *.local
 coverage
-data/db
+data/
 *.env
+.env.test
+.env.default
 
 # Editor directories and files
 .vscode/*
