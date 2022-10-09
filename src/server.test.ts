@@ -1,13 +1,17 @@
 import { Application } from 'express';
 import request from 'supertest';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import createServer from './server';
+import { connect, disconnect } from './utils/db';
 
-let server: Application;
+const server: Application = createServer();
 
-beforeAll(() => {
-  server = createServer();
+beforeAll(async () => {
+  await connect();
+});
+afterAll(async () => {
+  await disconnect();
 });
 
 describe('API', () => {
