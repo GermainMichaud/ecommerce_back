@@ -1,12 +1,12 @@
 import { DocumentType } from '@typegoose/typegoose';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 import { CreateOrderInput } from 'schemas/order.schema';
 
 import { Cart, CartModel } from '../models/cart.model';
 import { CartItemModel } from '../models/cartItem.model';
 import { ColorModel } from '../models/color.model';
 import { SizeModel } from '../models/size.model';
-import { Variant, VariantModel } from '../models/variant.model';
+import { VariantModel } from '../models/variant.model';
 
 export const getCart = async (token: string): Promise<DocumentType<Cart>> => {
   const cart = await CartModel.findOne({ token })
